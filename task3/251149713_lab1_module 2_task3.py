@@ -6,6 +6,8 @@ endmsg = "\r\n.\r\n"
 
 # Choose a mail server (e.g. Google mail server) and call it mailserver 
 mailserver = 'smtp.gmail.com'
+#serverName = ‘hostname’
+#serverPort = 12000
 
 
 # Create socket called clientSocket and establish a TCP connection with mailserver
@@ -15,6 +17,25 @@ clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((mailserver,25))
 
 #Fill in end
+
+
+#############
+# udp example
+
+# get user keyboard input
+# message = raw_input(’Input lowercase sentence:’)
+
+# attach server name, port to message; send into socket
+# clientSocket.sendto(message.encode(), (serverName, serverPort))
+
+# read reply characters from socket into string
+# modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+
+# print out received string and close socket
+# print modifiedMessage.decode()
+# clientSocket.close()
+#############
+
 
 recv = clientSocket.recv(1024).decode() 
 print(recv)
