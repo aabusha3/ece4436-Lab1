@@ -1,20 +1,28 @@
 from socket import *
 
+subject = "STMP mail sent from py"
 msg = "\r\n I love computer networks!" 
 endmsg = "\r\n.\r\n"
 
 
 # Choose a mail server (e.g. Google mail server) and call it mailserver 
 mailserver = 'smtp.gmail.com'
-#serverName = ‘hostname’
-#serverPort = 12000
+
+# enter user's gmail adress below
+user = 'ahmadzaidsami@gmail.com'
+
+# enter destinations's gmail adress below
+receiver = 'ahmadzaidsami@gmail.com'
 
 
 # Create socket called clientSocket and establish a TCP connection with mailserver
 
-#Fill in start
+#Fill in start 
+# 25 is regular mail 
+# 465 is gmails ssl
+# 587 is gmails TLS
 clientSocket = socket(AF_INET, SOCK_STREAM)
-clientSocket.connect((mailserver,25))
+clientSocket.connect((mailserver,587))
 
 #Fill in end
 
@@ -55,10 +63,9 @@ if recv1[:3] != '250':
 
 
 
-
 # Send MAIL FROM command and print server response.
  
-mailFromCommand = 'MAIL FROM: <mail@gmail.com>\r\n' 
+mailFromCommand = 'MAIL FROM: <'+ user +'>\r\n' 
 clientSocket.send(mailFromCommand.encode())
 recv2 = clientSocket.recv(1024).decode() 
 print(recv2)
@@ -69,7 +76,12 @@ if recv2[:3] != '250':
 # Send RCPT TO command and print server response.
 
 # Fill in start
-
+rcptToCommand = 'RCPT TO: <'+ receiver +'>\r\n'
+clientSocket.send(rcptToCommand.encode())
+recv3 = clientSocket.recv(1024).decode() 
+print(recv3)
+if recv3[:3] != '250':
+    print('250 reply not received from server.')
 
 
 
@@ -81,9 +93,19 @@ if recv2[:3] != '250':
 # Send DATA command and print server response.
 
 # Fill in start
+dataCommand = 'DATA\r\n'
+clientSocket.send(dataCommand.encode())
+recv4 = clientSocket.recv(1024).decode() 
+print(recv4)
+if recv4[:3] != '250':
+    print('250 reply not received from server.')
 
-
-
+msgCommand = "Subject: " + subject + "\r\n\r\n" + msg +"\r\n"+ endmsg +"\r\n"
+clientSocket.send(msgCommand.encode())
+recv5 = clientSocket.recv(1024).decode() 
+print(recv5)
+if recv5[:3] != '354':
+    print('354 reply not received from server.')
 
 # Fill in end
 
@@ -111,8 +133,13 @@ if recv2[:3] != '250':
 # Send QUIT command and get server response.221
 
 # Fill in start
-
-
+quitCommand = 'QUIT\r\n'
+clientSocket.send(quitCommand.encode())
+recv6 = clientSocket.recv(1024).decode() 
+print(recv6)
+if recv6[:3] != '221':
+    print('221 reply not received from server.')
+clientSocket.close()
 
 
 # Fill in end
