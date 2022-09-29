@@ -7,9 +7,10 @@ endmsg = '\r\n.\r\n' # end-of-message signifier
 
 # Choose a mail server (e.g. Google mail server) and call it mailserver
 mailServer = ('smtp.gmail.com', 465)
+# port 465 is for ssl connections, read more here: https://support.google.com/mail/answer/7126229?hl=en#zippy=%2Cstep-change-smtp-other-settings-in-your-email-client
 
 # Create socket called clientSocket and establish a TCP connection with mailserver
-clientSocket = ssl.wrap_socket(socket(AF_INET,SOCK_STREAM), ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL
+clientSocket = ssl.wrap_socket(socket(AF_INET,SOCK_STREAM), ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL protocol
 clientSocket.connect(mailServer)
 recv = clientSocket.recv(1024).decode()
 if recv[:3] == '220':
