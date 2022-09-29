@@ -42,7 +42,7 @@ if recv1[:3] != '250':
 #UP=("\000"+Username+"\000"+Password).encode("base64")
 
 
-auth = 'AUTH PLAIN\r\n'
+auth = 'AUTH LOGIN\r\n'
 wrappedSocket.send(auth.encode())
 recv_from_TLS = wrappedSocket.recv(1024).decode()
 print ("3: "+recv_from_TLS)
