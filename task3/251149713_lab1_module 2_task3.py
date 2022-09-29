@@ -1,30 +1,27 @@
 from socket import *
-import ssl
-import base64
+import ssl, base64
 
 #import OpenSSL
 
-msg = "\r\n I love computer networks!"
-endmsg = "\r\n.\r\n"
+msg = '\r\n I love computer networks!'
+endmsg = '\r\n.\r\n'
 # Choose a mail server (e.g. Google mail server) and call it mailserver
-mailServer = 'smtp.gmail.com'
-mailPort = 465
+mailServer = ('smtp.gmail.com', 465)
 #Fill in start   #Fill in end
 # Create socket called clientSocket and establish a TCP connection with mailserver
 #Fill in start
 
-clientSocket = socket(AF_INET,SOCK_STREAM)
-# wrappedSocket = ssl.SSLContext(ssl.PROTOCOL_TLSv1).wrap_socket(sock=clientSocket)
-wrappedSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL
+
+clientSocket = ssl.wrap_socket(socket(AF_INET,SOCK_STREAM), ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL
 
 
-wrappedSocket.connect((mailServer, mailPort))
+clientSocket.connect(mailServer)
 
 
 
-recv = wrappedSocket.recv(1024).decode()
+recv = clientSocket.recv(1024).decode()
 #Fill in end
-print ("1: "+recv)
+print ('1: '+recv)
 if recv[:3] != '220':
     print ('220 reply not received from server.1')
 
@@ -32,84 +29,74 @@ if recv[:3] != '220':
 
 
 # Send HELO command and print server response.
-heloCommand = 'HELO Alice\r\n'
-wrappedSocket.send(heloCommand.encode())
-recv1 = wrappedSocket.recv(1024).decode()
-print ("2: "+recv1)
-if recv1[:3] != '250':
+
+clientSocket.send('HELO Alice\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print ('2: '+recv)
+if recv[:3] != '250':
     print ('250 reply not received from server.2')
 
 
-
-#UP=("\000"+Username+"\000"+Password).encode("base64")
-
-
-auth = 'AUTH LOGIN\r\n'
-wrappedSocket.send(auth.encode())
-recv_from_TLS = wrappedSocket.recv(2048).decode()
-print ("3: "+recv_from_TLS)
-if recv_from_TLS[:3] != '334':
+clientSocket.send('AUTH LOGIN\r\n'.encode())
+recv = clientSocket.recv(2048).decode()
+print ('3: '+recv)
+if recv[:3] != '334':
     print('334 reply not received from server.3')
 
 
-name=input("Insert Username: ")
-username=base64.b64encode(name.encode())
-password= base64.b64encode(input('Insert Password: ').encode())
+name=input('Insert Username: ')
+# username=base64.b64encode(name.encode()) + '\r\n'
+# password= base64.b64encode(input('Insert Password: ').encode()) + '\r\n'
 # app password: tdlcluliqdrqibwr
 
-wrappedSocket.send(username + '\r\n'.encode())
-recv_user = wrappedSocket.recv(1024).decode()
-print(recv_user)
+clientSocket.send(base64.b64encode(name.encode()) + '\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print(recv)
 
-wrappedSocket.send(password + '\r\n'.encode())
-recv_pass = wrappedSocket.recv(1024).decode()
-print(recv_pass)
+clientSocket.send(base64.b64encode(input('Insert Password: ').encode()) + '\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print(recv)
 
 
 
 # Send MAIL FROM command and print server response.
 # Fill in start
-fromCommand = 'MAIL FROM: <'+ name+'>\r\n'
-wrappedSocket.send(fromCommand.encode())
-recv2 = wrappedSocket.recv(1024).decode()
-print ("4: "+recv2)
-if recv2[:3] != '250':
+clientSocket.send('MAIL FROM: <'+ name+'>\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print ('4: '+recv)
+if recv[:3] != '250':
     print('rcpt2 to 250 reply not received from server,  .4')
 # Fill in end
 
 # Send RCPT TO command and print server response.
 
-receiver =input("Send email to: ")
+
 # Fill in start
-toCommand = 'RCPT TO: <'+ receiver +'>\r\n'
-wrappedSocket.send(toCommand.encode())
-recv3 = wrappedSocket.recv(1024).decode()
-print ("5: "+recv3)
-if recv3[:3] != '250':
+clientSocket.send('RCPT TO: <'+ input('Send email to: ') +'>\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print ('5: '+recv)
+if recv[:3] != '250':
     print('rcpt3 to 250 reply not received from server,  .5')
 
 # Send DATA command and print server response.
 # Fill in start
 
-dataCommand = 'DATA\r\n'
-wrappedSocket.send(dataCommand.encode())
-recv4 = wrappedSocket.recv(1024).decode()
-print ("6: "+recv4)
-if recv4[:3] != '354':
+clientSocket.send('DATA\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print ('6: '+recv)
+if recv[:3] != '354':
     print('rcpt4 to 354 reply not received from server,  .6')
 
 
 
-wrappedSocket.send(msg.encode())
-wrappedSocket.send(endmsg.encode())
-recv5 = wrappedSocket.recv(1024).decode()
+clientSocket.send(msg.encode())
+clientSocket.send(endmsg.encode())
+recv = clientSocket.recv(1024).decode()
 
 #Fill in end
-
-quitCommand = "QUIT\r\n"
-wrappedSocket.send(quitCommand.encode())
-recv6 = wrappedSocket.recv(1024).decode()
-print ("8: "+recv6)
-if recv6[:3] != '221':
+clientSocket.send('QUIT\r\n'.encode())
+recv = clientSocket.recv(1024).decode()
+print ('8: '+recv)
+if recv[:3] != '221':
     print('rcpt6 to 221 reply not received from server,  .8')
-wrappedSocket.close()
+clientSocket.close()
