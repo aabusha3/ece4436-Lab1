@@ -2,23 +2,20 @@ from socket import *
 import ssl, base64
 
 
-msg = '\r\n I love computer networks!'
-endmsg = '\r\n.\r\n'
+msg = '\r\n I love computer networks!' # message to send
+endmsg = '\r\n.\r\n' # end-of-message signifier
+
 # Choose a mail server (e.g. Google mail server) and call it mailserver
 mailServer = ('smtp.gmail.com', 465)
+
 # Create socket called clientSocket and establish a TCP connection with mailserver
-
 clientSocket = ssl.wrap_socket(socket(AF_INET,SOCK_STREAM), ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL
-
 clientSocket.connect(mailServer)
-
 recv = clientSocket.recv(1024).decode()
 if recv[:3] == '220':
     print (recv)
 else:
     print('220 reply not received from server.\n'+recv)
-
-
 
 
 # Send HELO command and print server response.
@@ -30,6 +27,7 @@ else:
     print('250 reply not received from server.\n'+recv)
 
 
+# Send AUTH LOGIN command and print server response.
 clientSocket.send('AUTH LOGIN\r\n'.encode())
 recv = clientSocket.recv(2048).decode()
 if recv[:3] == '334':
@@ -38,9 +36,7 @@ else:
     print('334 reply not received from server.\n'+recv)
 
 
-# ahmadzaidsami@gmail.com
-# app password: tdlcluliqdrqibwr
-
+# Ask for username and send it, then print server response.
 name=input('Insert Username: ')
 clientSocket.send(base64.b64encode(name.encode()) + '\r\n'.encode())
 recv = clientSocket.recv(1024).decode()
@@ -49,13 +45,14 @@ if recv[:3] == '334':
 else:
     print('334 reply not received from server.\n'+recv)
 
+
+# Ask for password and send it, then print server response.
 clientSocket.send(base64.b64encode(input('Insert Password: ').encode()) + '\r\n'.encode())
 recv = clientSocket.recv(1024).decode()
 if recv[:3] == '235':
     print (recv)
 else:
     print('235 reply not received from server.\n'+recv)
-
 
 
 # Send MAIL FROM command and print server response.
@@ -66,6 +63,7 @@ if recv[:3] == '250':
 else:
     print('250 reply not received from server.\n'+recv)
 
+
 # Send RCPT TO command and print server response.
 clientSocket.send(('RCPT TO: <'+ input('Send email to: ') +'>\r\n').encode())
 recv = clientSocket.recv(1024).decode()
@@ -73,6 +71,7 @@ if recv[:3] == '250':
     print (recv)
 else:
     print('250 reply not received from server.\n'+recv)
+
 
 # Send DATA command and print server response.
 clientSocket.send('DATA\r\n'.encode())
@@ -83,6 +82,7 @@ else:
     print('354 reply not received from server.\n'+recv)
 
 
+# Send message and ENDMSG signifier and print server response.
 clientSocket.send(msg.encode())
 clientSocket.send(endmsg.encode())
 recv = clientSocket.recv(1024).decode()
@@ -92,6 +92,7 @@ else:
     print('250 reply not received from server.\n'+recv)
 
 
+# Send QUIT command and print server response, then close the connection.
 clientSocket.send('QUIT\r\n'.encode())
 recv = clientSocket.recv(1024).decode()
 if recv[:3] == '221':
