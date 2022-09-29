@@ -14,7 +14,9 @@ mailPort = 465
 #Fill in start
 
 clientSocket = socket(AF_INET,SOCK_STREAM)
-wrappedSocket = ssl.SSLContext(ssl.PROTOCOL_TLSv1).wrap_socket(sock=clientSocket)
+# wrappedSocket = ssl.SSLContext(ssl.PROTOCOL_TLSv1).wrap_socket(sock=clientSocket)
+wrappedSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_SSLv23) # Create socket using SSL
+
 
 wrappedSocket.connect((mailServer, mailPort))
 
@@ -44,32 +46,30 @@ if recv1[:3] != '250':
 
 auth = 'AUTH LOGIN\r\n'
 wrappedSocket.send(auth.encode())
-recv_from_TLS = wrappedSocket.recv(1024).decode()
+recv_from_TLS = wrappedSocket.recv(2048).decode()
 print ("3: "+recv_from_TLS)
 if recv_from_TLS[:3] != '334':
     print('334 reply not received from server.3')
 
 
-Username=input("Insert Username: ")
-Password= input('Insert Password: ')
+name=input("Insert Username: ")
+username=base64.b64encode(name.encode())
+password= base64.b64encode(input('Insert Password: ').encode())
+# app password: tdlcluliqdrqibwr
 
-UP = Username+"\0"+Password
-base64_str = ('%s\0%s' % (Username,Password)).encode()
-UP = base64.b64encode(base64_str)
-wrappedSocket.send(UP)
-try:
-    recv_auth = wrappedSocket.recv(1024).decode()
-except Exception as e: 
-    print(e)
+wrappedSocket.send(username + '\r\n'.encode())
+recv_user = wrappedSocket.recv(1024).decode()
+print(recv_user)
 
-print ("a: "+recv_auth)
-if recv_auth[:3] != '250':
-    print('250 reply not received from server.a')
+wrappedSocket.send(password + '\r\n'.encode())
+recv_pass = wrappedSocket.recv(1024).decode()
+print(recv_pass)
+
 
 
 # Send MAIL FROM command and print server response.
 # Fill in start
-fromCommand = 'MAIL FROM: <'+ Username+'>\r\n'
+fromCommand = 'MAIL FROM: <'+ name+'>\r\n'
 wrappedSocket.send(fromCommand.encode())
 recv2 = wrappedSocket.recv(1024).decode()
 print ("4: "+recv2)
@@ -98,14 +98,12 @@ print ("6: "+recv4)
 if recv4[:3] != '354':
     print('rcpt4 to 354 reply not received from server,  .6')
 
-Subject=input("Subject: ")
-# Text=input("Message: ")
-subjectCommand = "Subject: "+Subject+"\r\n"+msg+ endmsg
-wrappedSocket.send(subjectCommand.encode())
+
+
+wrappedSocket.send(msg.encode())
+wrappedSocket.send(endmsg.encode())
 recv5 = wrappedSocket.recv(1024).decode()
-print ("7: "+recv5)
-if recv5[:3] != '250':
-    print('rcpt5 to 250 reply not received from server,  .7')
+
 #Fill in end
 
 quitCommand = "QUIT\r\n"
