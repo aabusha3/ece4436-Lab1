@@ -1,3 +1,11 @@
+"""
+author: Ahmad Sami Abu Shawarib
+contact: aabusha3@uwo.ca
+description: a lab to demonstrate the process of sending gmail through SMTP without the use of smtplib
+Instructions: run the lab and the consol will ask for your gmail address (user@gmail.com), 
+              you APP password (https://support.google.com/accounts/answer/185833?hl=en), 
+              and the recipient gmail address (recipient@gmail.com)
+"""
 from socket import *
 import ssl, base64
 
@@ -101,3 +109,6 @@ if recv[:3] == '221':
 else:
     print('221 reply not received from server.\n'+recv)
 clientSocket.close()
+
+# end of program message
+print("mail sent succesfully - check the recipient's inbox \nconnection terminated")

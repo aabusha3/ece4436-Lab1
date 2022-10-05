@@ -1,3 +1,12 @@
+"""
+author: Ahmad Sami Abu Shawarib
+contact: aabusha3@uwo.ca
+description: a lab to demonstrate the process of sending gmail through SMTP with the use of smtplib
+Instructions: run the lab and the consol will ask for your gmail address (user@gmail.com), 
+              you APP password (https://support.google.com/accounts/answer/185833?hl=en), 
+              and the recipient's gmail address (recipient@gmail.com)
+"""
+
 from socket import *
 import ssl, smtplib
 
@@ -22,4 +31,4 @@ with smtplib.SMTP_SSL(mailServer, port, context=context) as clientSocket:
     clientSocket.quit()
     
 # end of program message
-print('mail sent succesfully')
+print("mail sent succesfully - check the recipient's inbox \nconnection terminated")
